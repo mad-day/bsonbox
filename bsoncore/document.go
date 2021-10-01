@@ -116,13 +116,14 @@ func newBufferFromReader(r io.Reader) ([]byte, error) {
 	}
 
 	length, _, _ := readi32(lengthBytes[:]) // ignore ok since we always have enough bytes to read a length
-	if length < 0 {
+	if length < 4 /* length < 0 */ { /* length has to be 4 bytes at least. */
 		return nil, ErrInvalidLength
 	}
 	buffer := make([]byte, length)
 
 	copy(buffer, lengthBytes[:])
 
+	/* if length < 4 then buffer[4:] panics. */
 	_, err = io.ReadFull(r, buffer[4:])
 	if err != nil {
 		return nil, err
