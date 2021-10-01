@@ -1,6 +1,6 @@
 ----------------------------------------------------------------------
-License notice for AWS V4 signing code from github.com/aws/aws-sdk-go
-AWS SDK for Go
+License notice for The Go driver for MongoDB from github.com/mongodb/mongo-go-driver
+The Go driver for MongoDB
 Copyright (C) MongoDB, Inc. 2017-present.
 ----------------------------------------------------------------------
 
