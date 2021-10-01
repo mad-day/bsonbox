@@ -830,7 +830,7 @@ func readstring(src []byte) (string, []byte, bool) {
 	if !ok {
 		return "", src, false
 	}
-	if len(src[4:]) < int(l) || l == 0 {
+	if len(rem) < int(l) || l == 0 {
 		return "", src, false
 	}
 
@@ -845,6 +845,9 @@ func readLengthBytes(src []byte) ([]byte, []byte, bool) {
 		return nil, src, false
 	}
 	if len(src) < int(l) {
+		return nil, src, false
+	}
+	if l < 4 { /* the header is 4 bytes long. */
 		return nil, src, false
 	}
 	return src[:l], src[l:], true
