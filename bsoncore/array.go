@@ -28,6 +28,12 @@ func NewArrayFromReader(r io.Reader) (Array, error) {
 	return newBufferFromReader(r)
 }
 
+// NewArrayFromReader2 reads an array from r. This function will only validate the length is
+// correct and that the array ends with a null byte. Uses alloc to allocate the memory for the array.
+func NewArrayFromReader2(r io.Reader, alloc Alloc) (Array, error) {
+	return newBufferFromReader2(r, alloc)
+}
+
 // Index searches for and retrieves the value at the given index. This method will panic if
 // the array is invalid or if the index is out of bounds.
 func (a Array) Index(index uint) Value {

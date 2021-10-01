@@ -93,6 +93,14 @@ var ErrElementNotFound = errors.New("element not found")
 // ErrOutOfBounds indicates that an index provided to access something was invalid.
 var ErrOutOfBounds = errors.New("out of bounds")
 
+// Allocates a new byte-slice. Returns a slice of size i.
+type Alloc func(i int) []byte
+
+func (a Alloc) alloc(i int) []byte {
+	if a==nil { return make([]byte,i) }
+	return a(i)
+}
+
 // Document is a raw bytes representation of a BSON document.
 type Document []byte
 
@@ -102,7 +110,16 @@ func NewDocumentFromReader(r io.Reader) (Document, error) {
 	return newBufferFromReader(r)
 }
 
+// NewDocumentFromReader2 reads a document from r. This function will only validate the length is
+// correct and that the document ends with a null byte. Uses alloc to allocate the memory for the document.
+func NewDocumentFromReader2(r io.Reader, alloc Alloc) (Document, error) {
+	return newBufferFromReader2(r, alloc)
+}
+
 func newBufferFromReader(r io.Reader) ([]byte, error) {
+	return newBufferFromReader2(r,nil)
+}
+func newBufferFromReader2(r io.Reader, alloc Alloc) ([]byte, error) {
 	if r == nil {
 		return nil, ErrNilReader
 	}
@@ -119,7 +136,7 @@ func newBufferFromReader(r io.Reader) ([]byte, error) {
 	if length < 4 /* length < 0 */ { /* length has to be 4 bytes at least. */
 		return nil, ErrInvalidLength
 	}
-	buffer := make([]byte, length)
+	buffer := alloc.alloc(int(length))
 
 	copy(buffer, lengthBytes[:])
 
