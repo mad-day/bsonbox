@@ -137,17 +137,21 @@ func newBufferFromReader2(r io.Reader, alloc Alloc) ([]byte, error) {
 		return nil, ErrInvalidLength
 	}
 	buffer := alloc.alloc(int(length))
+	
+	// If we have an allocator, we MUST return the buffer in any case, so the application can free it!
+	var nbuf []byte = nil
+	if alloc!=nil { nbuf = buffer }
 
 	copy(buffer, lengthBytes[:])
 
 	/* if length < 4 then buffer[4:] panics. */
 	_, err = io.ReadFull(r, buffer[4:])
 	if err != nil {
-		return nil, err
+		return nbuf, err
 	}
 
 	if buffer[length-1] != 0x00 {
-		return nil, ErrMissingNull
+		return nbuf, ErrMissingNull
 	}
 
 	return buffer, nil
